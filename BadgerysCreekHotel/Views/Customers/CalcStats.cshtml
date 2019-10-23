@@ -1,0 +1,69 @@
+﻿@model IEnumerable<BadgerysCreekHotel.Models.ViewModels.ProStat>
+
+@{
+    ViewData["Title"] = "CalcStats";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+    <h2>Customer distribution with respect to postcodes</h2>
+
+<br />
+
+<div>
+    <table class="table">
+        <tr>
+            <th>
+                Postcode
+            </th>
+            <th>
+                Number of Customers
+            </th>
+        </tr>
+
+        @foreach (var item in Model)
+        {
+            <tr>
+                <td>
+                    @Html.DisplayFor(modelItem => item.PostCode)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.NumOfCustomer)
+                </td>
+            </tr>
+        }
+    </table>
+</div>
+
+<h2>Booking distribution with respect to rooms</h2>
+<div>
+    <hr />
+    @if (ViewBag.BookingList.Count == 0)
+    {
+        <h4>NOT FOUND</h4>
+    }
+    else
+    {
+        <table class="table">            
+            <tr>
+                <th>
+                    Room ID
+                </th>
+                <th>
+                    Number Of Booking
+                </th>
+            </tr>
+
+            @foreach (var item in ViewBag.BookingList)
+            {
+                <tr>
+                    <td>
+                        @item.RoomID
+                    </td>
+                    <td>
+                        @item.NumOfBooking
+                    </td>
+                </tr>
+            }
+        </table>
+    }
+</div>
