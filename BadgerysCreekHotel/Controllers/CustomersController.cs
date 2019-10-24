@@ -174,20 +174,13 @@ namespace BadgerysCreekHotel.Controllers
             var dateIn = new SqliteParameter("dayIn", search.CheckIn);
             var dateOut = new SqliteParameter("dayOut", search.CheckOut);
             var bedCount = new SqliteParameter("bed", search.BedCount);
-
-
-            /*
-            var searchRoom = _context.Room.FromSqlRaw("select * from [Room] inner join [Booking] on [Room].ID = [Booking].RoomID "
-                + "where [Room].ID not in"
-                + "select [Room].ID from [Room] inner join [Booking] on [Room].ID = [Booking].RoomID"
-                + "where [Booking].CheckOut > @dayIn", dateIn)
-                inner join [Booking] on [Room].ID = [Booking].RoomID
-                */
+           
             var searchRoom = _context.Room.FromSqlRaw("select [Room].ID, [Room].Level, [Room].BedCount, [Room].Price from [Room] inner join [Booking] on [Room].ID = [Booking].RoomID "
                   + "where [Room].BedCount = @bed "
                   + "and [Room].ID not in "
                   + "(select [Room].ID from [Room] inner join [Booking] on [Room].ID = [Booking].RoomID "
-                  + "where [Booking].CheckIn between @dayIn and @dayOut or [Booking].CheckOut between @dayIn and @dayOut )", bedCount, dateIn, dateOut)
+                  + "where ([Booking].CheckIn between @dayIn and @dayOut or [Booking].CheckOut between @dayIn and @dayOut) or " 
+                  + "(@dayIn between [Booking].CheckIn and [Booking].CheckOut and @dayOut between [Booking].CheckIn and [Booking].CheckOut))", bedCount, dateIn, dateOut)
                 .Select(ro => new Room {ID = ro.ID, Level = ro.Level, BedCount = ro.BedCount, Price = ro.Price}).Distinct();
 
             ViewBag.SearchRoom = await searchRoom.ToListAsync();
