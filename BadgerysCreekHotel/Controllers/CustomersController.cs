@@ -174,7 +174,15 @@ namespace BadgerysCreekHotel.Controllers
             var dateIn = new SqliteParameter("dayIn", search.CheckIn);
             var dateOut = new SqliteParameter("dayOut", search.CheckOut);
             var bedCount = new SqliteParameter("bed", search.BedCount);
-           
+
+
+            /*
+            var searchRoom = _context.Room.FromSqlRaw("select * from [Room] inner join [Booking] on [Room].ID = [Booking].RoomID "
+                + "where [Room].ID not in"
+                + "select [Room].ID from [Room] inner join [Booking] on [Room].ID = [Booking].RoomID"
+                + "where [Booking].CheckOut > @dayIn", dateIn)
+                inner join [Booking] on [Room].ID = [Booking].RoomID
+                */
             var searchRoom = _context.Room.FromSqlRaw("select [Room].ID, [Room].Level, [Room].BedCount, [Room].Price from [Room] inner join [Booking] on [Room].ID = [Booking].RoomID "
                   + "where [Room].BedCount = @bed "
                   + "and [Room].ID not in "
@@ -207,6 +215,40 @@ namespace BadgerysCreekHotel.Controllers
             return View(await PCStats.ToListAsync());
         }
 
+        //6.3 Search Room Link
+        // GET: Customers//BookARoom
+        [Authorize(Roles = "customers")]
+        public IActionResult BookARoom()
+        {
+            ViewBag.BookingList = new SelectList(_context.Room, "ID", "CheckIn");
+            return View();
+        }
 
+        [HttpPost, ValidateAntiForgeryToken]
+        [Authorize(Roles = "customers")]
+        public async Task<IActionResult> BookARoom(BookARoom book)
+        {
+            var dateIn = new SqliteParameter("dayIn", book.CheckIn);
+            var dateOut = new SqliteParameter("dayOut", book.CheckOut);
+            var ID = new SqliteParameter("ID", book.RoomID);
+
+
+            /*
+            var bookARoom = _context.Room.FromSqlRaw("select * from [Room] inner join [Booking] on [Room].ID = [Booking].RoomID "
+                + "where [Room].ID not in"
+                + "select [Room].ID from [Room] inner join [Booking] on [Room].ID = [Booking].RoomID"
+                + "where [Booking].CheckOut > @dayIn", dateIn)
+                inner join [Booking] on [Room].ID = [Booking].RoomID
+                */
+            var bookARoom = _context.Room.FromSqlRaw("select [Room].ID, [Room].Level, [Room].BedCount, [Room].Price from [Room] inner join [Booking] on [Room].ID = [Booking].RoomID "
+                  + "where [Room].BedCount = @bed "
+                  + "and [Room].ID not in "
+                  + "(select [Room].ID from [Room] inner join [Booking] on [Room].ID = [Booking].RoomID "
+                  + "where [Booking].CheckIn between @dayIn and @dayOut or [Booking].CheckOut between @dayIn and @dayOut )", ID, dateIn, dateOut)
+                .Select(ro => new Room { ID = ro.ID, Level = ro.Level, Price = ro.Price }).Distinct();
+
+            ViewBag.BookARoom = await bookARoom.ToListAsync();
+            return View(book);
+        }
     }
 }

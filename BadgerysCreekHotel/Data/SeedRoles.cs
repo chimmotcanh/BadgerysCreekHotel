@@ -3,7 +3,6 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using BadgerysCreekHotel.Models;
 
 namespace BadgerysCreekHotel.Data
 {
@@ -15,7 +14,7 @@ namespace BadgerysCreekHotel.Data
             var RoleManager = serviceProvider.GetRequiredService<RoleManager<IdentityRole>>();
             var UserManager = serviceProvider.GetRequiredService<UserManager<IdentityUser>>();
             // Include your role names here
-            string[] roleNames = { "administrators", "customers" };
+            string[] roleNames = { "Admin", "Customers" };
             IdentityResult roleResult;
 
             foreach (var roleName in roleNames)
@@ -46,8 +45,8 @@ namespace BadgerysCreekHotel.Data
                 var createPowerUser = await UserManager.CreateAsync(poweruser, userPassword);
                 if (createPowerUser.Succeeded)
                 {
-                    // here we assign the new user the "administrators" role 
-                    await UserManager.AddToRoleAsync(poweruser, "administrators");
+                    // here we assign the new user the "Admin" role 
+                    await UserManager.AddToRoleAsync(poweruser, "Admin");
                 }
             }
         }

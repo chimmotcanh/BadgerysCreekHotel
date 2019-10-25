@@ -29,17 +29,8 @@ namespace BadgerysCreekHotel
         {
             services.AddDbContext<ApplicationDbContext>(options =>
                 options.UseSqlite("Data Source=BCH.db"));
-
-            /*services.AddDefaultIdentity<IdentityUser>(options => options.SignIn.RequireConfirmedAccount = true)
+            services.AddDefaultIdentity<IdentityUser>(options => options.SignIn.RequireConfirmedAccount = true)
                 .AddEntityFrameworkStores<ApplicationDbContext>();
-            */
-
-            //S2
-            services.AddIdentity<IdentityUser, IdentityRole>()
-                       .AddEntityFrameworkStores<ApplicationDbContext>()
-                       .AddDefaultUI()
-                       .AddDefaultTokenProviders();
-
             services.AddControllersWithViews();
             services.AddRazorPages();
         }
